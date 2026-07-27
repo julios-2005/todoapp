@@ -1,5 +1,5 @@
 // URL del backend (cambiaremos esto después)
-const API_URL = 'http://localhost:3000/api';
+const API_URL = 'https://todoapp-backend-oh3i.onrender.com/';
 let allTasks = [];
 
 // Elementos del DOM
