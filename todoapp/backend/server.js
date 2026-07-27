@@ -4,7 +4,15 @@ const { Pool } = require('pg');
 require('dotenv').config();
 
 const app = express();
-app.use(cors());
+
+// CORS configurado
+app.use(cors({
+  origin: ['https://todoapp-frontend-r79g.onrender.com', 'http://localhost:3000'],
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE'],
+  allowedHeaders: ['Content-Type']
+}));
+
 app.use(express.json());
 
 // Conexión a PostgreSQL
