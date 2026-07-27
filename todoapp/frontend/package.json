@@ -1,0 +1,11 @@
+{
+  "name": "todoapp-frontend",
+  "version": "1.0.0",
+  "main": "index.html",
+  "scripts": {
+    "start": "npx http-server . -p 3000"
+  },
+  "dependencies": {
+    "http-server": "^14.1.1"
+  }
+}
