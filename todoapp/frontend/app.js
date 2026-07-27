@@ -1,5 +1,5 @@
 // URL del backend (cambiaremos esto después)
-const API_URL = 'https://todoapp-backendd.onrender.com';
+const API_URL = '/api';
 let allTasks = [];
 
 // Elementos del DOM
