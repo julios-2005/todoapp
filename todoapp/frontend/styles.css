@@ -1,0 +1,136 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+}
+
+.container {
+  background: white;
+  border-radius: 15px;
+  box-shadow: 0 15px 50px rgba(0, 0, 0, 0.2);
+  width: 100%;
+  max-width: 500px;
+  padding: 30px;
+}
+
+h1 {
+  color: #333;
+  margin-bottom: 25px;
+  text-align: center;
+  font-size: 28px;
+}
+
+.input-group {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+input[type="text"] {
+  flex: 1;
+  padding: 12px 15px;
+  border: 2px solid #e0e0e0;
+  border-radius: 8px;
+  font-size: 14px;
+  transition: border-color 0.3s;
+}
+
+input[type="text"]:focus {
+  outline: none;
+  border-color: #667eea;
+}
+
+button {
+  padding: 12px 20px;
+  background: #667eea;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: background 0.3s;
+  font-size: 14px;
+}
+
+button:hover {
+  background: #764ba2;
+}
+
+#taskList {
+  list-style: none;
+  max-height: 500px;
+  overflow-y: auto;
+}
+
+.task-item {
+  display: flex;
+  align-items: center;
+  padding: 15px;
+  background: #f5f5f5;
+  border-radius: 8px;
+  margin-bottom: 10px;
+  gap: 12px;
+  transition: background 0.2s;
+}
+
+.task-item:hover {
+  background: #efefef;
+}
+
+.task-item input[type="checkbox"] {
+  cursor: pointer;
+  width: 20px;
+  height: 20px;
+  accent-color: #667eea;
+}
+
+.task-item span {
+  flex: 1;
+  font-size: 15px;
+  color: #333;
+}
+
+.task-item.completed span {
+  text-decoration: line-through;
+  color: #999;
+}
+
+.delete-btn {
+  background: #e74c3c;
+  padding: 8px 12px;
+  font-size: 12px;
+  min-width: 80px;
+}
+
+.delete-btn:hover {
+  background: #c0392b;
+}
+
+/* Scrollbar personalizado */
+#taskList::-webkit-scrollbar {
+  width: 8px;
+}
+
+#taskList::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 10px;
+}
+
+#taskList::-webkit-scrollbar-thumb {
+  background: #667eea;
+  border-radius: 10px;
+}
+
+#taskList::-webkit-scrollbar-thumb:hover {
+  background: #764ba2;
+}
