@@ -81,6 +81,7 @@ button:hover {
   margin-bottom: 10px;
   gap: 12px;
   transition: background 0.2s;
+  flex-wrap: wrap;
 }
 
 .task-item:hover {
@@ -92,17 +93,55 @@ button:hover {
   width: 20px;
   height: 20px;
   accent-color: #667eea;
+  min-width: 20px;
 }
 
-.task-item span {
+.task-item .task-title {
   flex: 1;
   font-size: 15px;
   color: #333;
+  cursor: pointer;
+  user-select: none;
+  min-width: 150px;
 }
 
-.task-item.completed span {
+.task-item .task-title:hover {
+  color: #667eea;
+  text-decoration: underline;
+}
+
+.task-item.completed .task-title {
   text-decoration: line-through;
   color: #999;
+}
+
+/* Edit input styling */
+.edit-input {
+  flex: 1;
+  padding: 8px 12px !important;
+  border: 2px solid #667eea !important;
+  background: white !important;
+  font-size: 14px !important;
+  min-width: 150px !important;
+}
+
+.edit-input:focus {
+  outline: none !important;
+  border-color: #764ba2 !important;
+  box-shadow: 0 0 5px rgba(102, 126, 234, 0.3);
+}
+
+/* Button styling for task actions */
+.edit-btn {
+  background: #2196F3;
+  padding: 8px 12px;
+  font-size: 12px;
+  min-width: 80px;
+  margin: 0;
+}
+
+.edit-btn:hover {
+  background: #1976D2;
 }
 
 .delete-btn {
@@ -110,10 +149,34 @@ button:hover {
   padding: 8px 12px;
   font-size: 12px;
   min-width: 80px;
+  margin: 0;
 }
 
 .delete-btn:hover {
   background: #c0392b;
+}
+
+/* Save and Cancel buttons for edit mode */
+.save-btn {
+  background: #27ae60;
+  padding: 8px 12px;
+  font-size: 12px;
+  min-width: 80px;
+}
+
+.save-btn:hover {
+  background: #229954;
+}
+
+.cancel-btn {
+  background: #95a5a6;
+  padding: 8px 12px;
+  font-size: 12px;
+  min-width: 90px;
+}
+
+.cancel-btn:hover {
+  background: #7f8c8d;
 }
 
 /* Scrollbar personalizado */
@@ -133,4 +196,24 @@ button:hover {
 
 #taskList::-webkit-scrollbar-thumb:hover {
   background: #764ba2;
+}
+
+/* Responsive design */
+@media (max-width: 600px) {
+  .task-item {
+    gap: 8px;
+    padding: 12px;
+  }
+
+  .task-item button {
+    flex: 0 1 auto;
+    padding: 6px 10px;
+    font-size: 11px;
+    min-width: 70px;
+  }
+
+  .edit-input {
+    min-width: 120px !important;
+    flex-basis: 100%;
+  }
 }
