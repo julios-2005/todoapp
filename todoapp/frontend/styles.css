@@ -19,7 +19,7 @@ body {
   border-radius: 15px;
   box-shadow: 0 15px 50px rgba(0, 0, 0, 0.2);
   width: 100%;
-  max-width: 500px;
+  max-width: 600px;
   padding: 30px;
 }
 
@@ -36,16 +36,23 @@ h1 {
   margin-bottom: 20px;
 }
 
-input[type="text"] {
+input[type="text"],
+input[type="date"],
+textarea,
+select {
   flex: 1;
   padding: 12px 15px;
   border: 2px solid #e0e0e0;
   border-radius: 8px;
   font-size: 14px;
   transition: border-color 0.3s;
+  font-family: inherit;
 }
 
-input[type="text"]:focus {
+input[type="text"]:focus,
+input[type="date"]:focus,
+textarea:focus,
+select:focus {
   outline: none;
   border-color: #667eea;
 }
@@ -66,9 +73,24 @@ button:hover {
   background: #764ba2;
 }
 
+.details-group {
+  background: #f9f9f9;
+  padding: 15px;
+  border-radius: 8px;
+  margin-bottom: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.details-group textarea {
+  resize: vertical;
+  min-height: 80px;
+}
+
 #taskList {
   list-style: none;
-  max-height: 500px;
+  max-height: 600px;
   overflow-y: auto;
 }
 
@@ -80,12 +102,14 @@ button:hover {
   border-radius: 8px;
   margin-bottom: 10px;
   gap: 12px;
-  transition: background 0.2s;
+  transition: all 0.2s;
   flex-wrap: wrap;
+  cursor: grab;
 }
 
 .task-item:hover {
   background: #efefef;
+  transform: translateX(2px);
 }
 
 .task-item input[type="checkbox"] {
@@ -96,18 +120,60 @@ button:hover {
   min-width: 20px;
 }
 
-.task-item .task-title {
+.task-content {
   flex: 1;
-  font-size: 15px;
-  color: #333;
-  cursor: pointer;
-  user-select: none;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
   min-width: 150px;
 }
 
-.task-item .task-title:hover {
+.task-title {
+  font-size: 15px;
+  font-weight: bold;
+  color: #333;
+  cursor: pointer;
+  user-select: none;
+  word-break: break-word;
+}
+
+.task-title:hover {
   color: #667eea;
   text-decoration: underline;
+}
+
+.task-description {
+  font-size: 12px;
+  color: #666;
+  margin: 3px 0;
+  max-width: 300px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.task-date {
+  font-size: 11px;
+  color: #999;
+}
+
+.task-priority {
+  padding: 3px 8px;
+  border-radius: 4px;
+  color: white;
+  font-size: 10px;
+  font-weight: bold;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.task-category {
+  padding: 3px 8px;
+  background: #e3f2fd;
+  border-radius: 4px;
+  font-size: 11px;
+  color: #1976D2;
+  white-space: nowrap;
 }
 
 .task-item.completed .task-title {
@@ -115,7 +181,6 @@ button:hover {
   color: #999;
 }
 
-/* Edit input styling */
 .edit-input {
   flex: 1;
   padding: 8px 12px !important;
@@ -131,16 +196,28 @@ button:hover {
   box-shadow: 0 0 5px rgba(102, 126, 234, 0.3);
 }
 
-/* Button styling for task actions */
 .edit-btn {
   background: #2196F3;
   padding: 8px 12px;
   font-size: 12px;
   min-width: 80px;
   margin: 0;
+  flex: 0 1 auto;
 }
 
 .edit-btn:hover {
+  background: #1976D2;
+}
+
+.edit-details-btn {
+  background: #2196F3;
+  padding: 8px 12px;
+  font-size: 12px;
+  min-width: 80px;
+  flex: 0 1 auto;
+}
+
+.edit-details-btn:hover {
   background: #1976D2;
 }
 
@@ -150,18 +227,19 @@ button:hover {
   font-size: 12px;
   min-width: 80px;
   margin: 0;
+  flex: 0 1 auto;
 }
 
 .delete-btn:hover {
   background: #c0392b;
 }
 
-/* Save and Cancel buttons for edit mode */
 .save-btn {
   background: #27ae60;
   padding: 8px 12px;
   font-size: 12px;
   min-width: 80px;
+  flex: 0 1 auto;
 }
 
 .save-btn:hover {
@@ -173,13 +251,25 @@ button:hover {
   padding: 8px 12px;
   font-size: 12px;
   min-width: 90px;
+  flex: 0 1 auto;
 }
 
 .cancel-btn:hover {
   background: #7f8c8d;
 }
 
-/* Scrollbar personalizado */
+.sortable-ghost {
+  opacity: 0.4;
+  background: #f0f0f0;
+}
+
+.sortable-drag {
+  opacity: 1;
+  background: #fff;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+  cursor: grabbing;
+}
+
 #taskList::-webkit-scrollbar {
   width: 8px;
 }
@@ -198,8 +288,11 @@ button:hover {
   background: #764ba2;
 }
 
-/* Responsive design */
 @media (max-width: 600px) {
+  .container {
+    padding: 20px;
+  }
+
   .task-item {
     gap: 8px;
     padding: 12px;
@@ -209,11 +302,18 @@ button:hover {
     flex: 0 1 auto;
     padding: 6px 10px;
     font-size: 11px;
-    min-width: 70px;
+    min-width: 65px;
   }
 
   .edit-input {
-    min-width: 120px !important;
-    flex-basis: 100%;
+    flex-basis: 100% !important;
+  }
+
+  .task-description {
+    max-width: 200px;
+  }
+
+  h1 {
+    font-size: 24px;
   }
 }
