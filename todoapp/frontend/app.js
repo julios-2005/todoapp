@@ -8,6 +8,9 @@ let showingDetails = false;
 // ===== ELEMENTOS DEL DOM =====
 const taskInput = document.getElementById('taskInput');
 const filterInput = document.getElementById('filterInput');
+const priorityFilter = document.getElementById('priorityFilter');
+const categoryFilter = document.getElementById('categoryFilter');
+const sortByDateCheckbox = document.getElementById('sortByDateCheckbox');
 const addBtn = document.getElementById('addBtn');
 const taskList = document.getElementById('taskList');
  
@@ -29,6 +32,9 @@ taskInput.addEventListener('keypress', (e) => {
   if (e.key === 'Enter') addTask();
 });
 filterInput.addEventListener('keyup', filterTasks);
+priorityFilter.addEventListener('change', filterTasks);
+categoryFilter.addEventListener('change', filterTasks);
+sortByDateCheckbox.addEventListener('change', filterTasks);
 saveDetailsBtn.addEventListener('click', saveTaskDetails);
 cancelDetailsBtn.addEventListener('click', cancelTaskDetails);
  
@@ -38,8 +44,7 @@ async function fetchTasks() {
   try {
     const response = await fetch(`${API_URL}/tasks`);
     allTasks = await response.json();
-    renderTasks(allTasks);
-    initSortable();
+    filterTasks();
   } catch (error) {
     console.error('Error al cargar tareas:', error);
     taskList.innerHTML = '<li class="task-item" style="color: red;">Error al conectar</li>';
@@ -377,13 +382,31 @@ function renderTasks(tasks) {
 // ===== FILTRO =====
 function filterTasks() {
   const filter = filterInput.value.toLowerCase();
-  const filtered = allTasks.filter(task =>
-    task.title.toLowerCase().includes(filter) ||
-    (task.description && task.description.toLowerCase().includes(filter)) ||
-    task.category.toLowerCase().includes(filter)
-  );
+  const priority = priorityFilter.value;
+  const category = categoryFilter.value;
+
+  let filtered = allTasks.filter(task => {
+    const matchesText = !filter ||
+      task.title.toLowerCase().includes(filter) ||
+      (task.description && task.description.toLowerCase().includes(filter)) ||
+      task.category.toLowerCase().includes(filter);
+
+    const matchesPriority = priority === 'all' || task.priority === priority;
+    const matchesCategory = category === 'all' || task.category === category;
+
+    return matchesText && matchesPriority && matchesCategory;
+  });
+
+  if (sortByDateCheckbox.checked) {
+    filtered = [...filtered].sort((a, b) => {
+      if (!a.due_date && !b.due_date) return 0;
+      if (!a.due_date) return 1;
+      if (!b.due_date) return -1;
+      return new Date(a.due_date) - new Date(b.due_date);
+    });
+  }
+
   renderTasks(filtered);
-  initSortable();
 }
  
 // ========== FIN DEL CÓDIGO ==========
