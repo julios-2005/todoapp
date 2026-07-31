@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Mi To-Do List</title>
+  <title>Mi To-Do List Avanzada</title>
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
@@ -15,11 +15,30 @@
       <button id="addBtn">➕ Agregar</button>
     </div>
 
+    <div class="details-group" id="detailsGroup" style="display: none;">
+      <textarea id="descriptionInput" placeholder="Descripción (opcional)"></textarea>
+      <input type="date" id="dueDateInput">
+      <select id="priorityInput">
+        <option value="low">🟢 Baja Prioridad</option>
+        <option value="medium" selected>🟡 Media Prioridad</option>
+        <option value="high">🔴 Alta Prioridad</option>
+      </select>
+      <select id="categoryInput">
+        <option value="personal">👤 Personal</option>
+        <option value="work">💼 Trabajo</option>
+        <option value="shopping">🛒 Compras</option>
+        <option value="health">🏥 Salud</option>
+      </select>
+      <button id="saveDetailsBtn">💾 Guardar Detalles</button>
+      <button id="cancelDetailsBtn">❌ Cancelar</button>
+    </div>
+
     <input type="text" id="filterInput" placeholder="🔍 Filtrar tareas...">
 
     <ul id="taskList"></ul>
   </div>
 
+  <script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
   <script src="app.js"></script>
 </body>
 </html>
