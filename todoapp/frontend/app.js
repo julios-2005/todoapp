@@ -187,6 +187,9 @@ function resetDetailsFields() {
   priorityInput.value = 'medium';
   categoryInput.value = 'personal';
   if (detailsTaskTitle) detailsTaskTitle.textContent = '';
+  taskInput.value = '';
+  taskInput.disabled = false;
+  addBtn.disabled = false;
 }
 
 function editTaskDetails(id) {
@@ -201,6 +204,10 @@ function editTaskDetails(id) {
   priorityInput.value = task.priority || 'medium';
   categoryInput.value = task.category || 'personal';
   if (detailsTaskTitle) detailsTaskTitle.textContent = `Editando detalles de: ${task.title}`;
+
+  taskInput.value = task.title;
+  taskInput.disabled = true;
+  addBtn.disabled = true;
   
   detailsGroup.style.display = 'flex';
   descriptionInput.focus();
