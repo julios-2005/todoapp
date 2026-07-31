@@ -1,35 +1,48 @@
 // URL del backend (cambiaremos esto después)
 const API_URL = '/api';
 let allTasks = [];
-let editingId = null; // Track which task is being edited
+let editingId = null;
+let currentTaskBeingEdited = null;
+let showingDetails = false;
  
-// Elementos del DOM
+// ===== ELEMENTOS DEL DOM =====
 const taskInput = document.getElementById('taskInput');
 const filterInput = document.getElementById('filterInput');
 const addBtn = document.getElementById('addBtn');
 const taskList = document.getElementById('taskList');
  
-// Cargar tareas cuando carga la página
+// Elementos de detalles avanzados
+const detailsGroup = document.getElementById('detailsGroup');
+const descriptionInput = document.getElementById('descriptionInput');
+const dueDateInput = document.getElementById('dueDateInput');
+const priorityInput = document.getElementById('priorityInput');
+const categoryInput = document.getElementById('categoryInput');
+const saveDetailsBtn = document.getElementById('saveDetailsBtn');
+const cancelDetailsBtn = document.getElementById('cancelDetailsBtn');
+ 
+// ===== CARGAR TAREAS AL INICIAR =====
 fetchTasks();
  
-// Event listeners
+// ===== EVENT LISTENERS =====
 addBtn.addEventListener('click', addTask);
 taskInput.addEventListener('keypress', (e) => {
   if (e.key === 'Enter') addTask();
 });
- 
 filterInput.addEventListener('keyup', filterTasks);
+saveDetailsBtn.addEventListener('click', saveTaskDetails);
+cancelDetailsBtn.addEventListener('click', cancelTaskDetails);
  
-// ========== FUNCIONES ==========
+// ========== FUNCIONES PRINCIPALES ==========
  
 async function fetchTasks() {
   try {
     const response = await fetch(`${API_URL}/tasks`);
     allTasks = await response.json();
     renderTasks(allTasks);
+    initSortable();
   } catch (error) {
     console.error('Error al cargar tareas:', error);
-    taskList.innerHTML = '<li class="task-item" style="color: red;">Error al conectar con el servidor</li>';
+    taskList.innerHTML = '<li class="task-item" style="color: red;">Error al conectar</li>';
   }
 }
  
@@ -43,11 +56,22 @@ async function addTask() {
     const response = await fetch(`${API_URL}/tasks`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ title: taskInput.value }),
+      body: JSON.stringify({
+        title: taskInput.value,
+        description: descriptionInput.value || null,
+        due_date: dueDateInput.value || null,
+        priority: priorityInput.value,
+        category: categoryInput.value
+      }),
     });
  
     if (response.ok) {
       taskInput.value = '';
+      descriptionInput.value = '';
+      dueDateInput.value = '';
+      priorityInput.value = 'medium';
+      categoryInput.value = 'personal';
+      detailsGroup.style.display = 'none';
       fetchTasks();
     } else {
       alert('Error al agregar tarea');
@@ -79,7 +103,14 @@ async function toggleTask(id, completed) {
     const response = await fetch(`${API_URL}/tasks/${id}`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ title: task.title, completed: !completed }),
+      body: JSON.stringify({ 
+        title: task.title,
+        description: task.description,
+        due_date: task.due_date,
+        priority: task.priority,
+        category: task.category,
+        completed: !completed 
+      }),
     });
     if (response.ok) {
       fetchTasks();
@@ -89,13 +120,10 @@ async function toggleTask(id, completed) {
   }
 }
  
-// NEW: Edit task function
-async function startEditTask(id) {
-  const task = allTasks.find(t => t.id === id);
+// ===== EDITAR TÍTULO (INLINE) =====
+function startEditTask(id) {
   editingId = id;
   renderTasks(allTasks);
-  
-  // Focus on the input after render
   setTimeout(() => {
     const input = document.querySelector(`#edit-input-${id}`);
     if (input) {
@@ -105,7 +133,6 @@ async function startEditTask(id) {
   }, 0);
 }
  
-// NEW: Save edited task
 async function saveEditTask(id) {
   const input = document.querySelector(`#edit-input-${id}`);
   const newTitle = input.value.trim();
@@ -120,7 +147,14 @@ async function saveEditTask(id) {
     const response = await fetch(`${API_URL}/tasks/${id}`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ title: newTitle, completed: task.completed }),
+      body: JSON.stringify({ 
+        title: newTitle,
+        description: task.description,
+        due_date: task.due_date,
+        priority: task.priority,
+        category: task.category,
+        completed: task.completed
+      }),
     });
     
     if (response.ok) {
@@ -135,13 +169,11 @@ async function saveEditTask(id) {
   }
 }
  
-// NEW: Cancel edit
 function cancelEditTask() {
   editingId = null;
   renderTasks(allTasks);
 }
  
-// NEW: Handle Enter/Escape in edit input
 function handleEditKeypress(e, id) {
   if (e.key === 'Enter') {
     saveEditTask(id);
@@ -150,6 +182,100 @@ function handleEditKeypress(e, id) {
   }
 }
  
+// ===== EDITAR DETALLES (MODAL/PANEL) =====
+function editTaskDetails(id) {
+  const task = allTasks.find(t => t.id === id);
+  if (!task) return;
+  
+  currentTaskBeingEdited = id;
+  showingDetails = true;
+  
+  descriptionInput.value = task.description || '';
+  dueDateInput.value = task.due_date || '';
+  priorityInput.value = task.priority || 'medium';
+  categoryInput.value = task.category || 'personal';
+  
+  detailsGroup.style.display = 'flex';
+  descriptionInput.focus();
+}
+ 
+async function saveTaskDetails() {
+  if (!currentTaskBeingEdited) return;
+  
+  try {
+    const task = allTasks.find(t => t.id === currentTaskBeingEdited);
+    
+    const response = await fetch(`${API_URL}/tasks/${currentTaskBeingEdited}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        title: task.title,
+        description: descriptionInput.value || null,
+        due_date: dueDateInput.value || null,
+        priority: priorityInput.value,
+        category: categoryInput.value,
+        completed: task.completed
+      })
+    });
+    
+    if (response.ok) {
+      currentTaskBeingEdited = null;
+      showingDetails = false;
+      detailsGroup.style.display = 'none';
+      fetchTasks();
+      alert('Detalles guardados');
+    }
+  } catch (error) {
+    console.error('Error:', error);
+    alert('Error al guardar');
+  }
+}
+ 
+function cancelTaskDetails() {
+  currentTaskBeingEdited = null;
+  showingDetails = false;
+  detailsGroup.style.display = 'none';
+}
+ 
+// ===== DRAG & DROP =====
+function initSortable() {
+  if (typeof Sortable === 'undefined') {
+    console.warn('SortableJS no está cargado');
+    return;
+  }
+  
+  Sortable.create(taskList, {
+    animation: 150,
+    ghostClass: 'sortable-ghost',
+    dragClass: 'sortable-drag',
+    onEnd: async function(evt) {
+      const taskIds = Array.from(taskList.querySelectorAll('.task-item'))
+        .map(li => parseInt(li.dataset.taskId));
+      
+      await updateTaskOrder(taskIds);
+    }
+  });
+}
+ 
+async function updateTaskOrder(taskIds) {
+  try {
+    const response = await fetch(`${API_URL}/tasks/reorder`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ taskIds: taskIds })
+    });
+    
+    if (!response.ok) {
+      console.error('Error actualizando orden');
+      fetchTasks();
+    }
+  } catch (error) {
+    console.error('Error:', error);
+    fetchTasks();
+  }
+}
+ 
+// ===== RENDERIZAR TAREAS =====
 function renderTasks(tasks) {
   taskList.innerHTML = '';
   
@@ -161,9 +287,23 @@ function renderTasks(tasks) {
   tasks.forEach(task => {
     const li = document.createElement('li');
     li.className = `task-item ${task.completed ? 'completed' : ''}`;
+    li.dataset.taskId = task.id;
     
-    // If this task is being edited, show edit input
+    // Colores de prioridad
+    const priorityColors = {
+      'high': '#ff4444',
+      'medium': '#ffaa00',
+      'low': '#44aa44'
+    };
+    const priorityColor = priorityColors[task.priority] || '#666';
+    
+    // Formatear fecha
+    const dueDate = task.due_date 
+      ? new Date(task.due_date).toLocaleDateString('es-ES')
+      : '';
+    
     if (editingId === task.id) {
+      // MODO EDICIÓN DE TÍTULO
       li.innerHTML = `
         <input type="checkbox" disabled ${task.completed ? 'checked' : ''} 
                style="cursor: not-allowed; opacity: 0.5;">
@@ -174,23 +314,47 @@ function renderTasks(tasks) {
         <button class="cancel-btn" onclick="cancelEditTask()">❌ Cancelar</button>
       `;
     } else {
-      // Normal task display
+      // MODO NORMAL
       li.innerHTML = `
         <input type="checkbox" ${task.completed ? 'checked' : ''} 
                onchange="toggleTask(${task.id}, ${task.completed})">
-        <span class="task-title" ondblclick="startEditTask(${task.id})">${task.title}</span>
+        
+        <div class="task-content">
+          <span class="task-title" ondblclick="startEditTask(${task.id})">${task.title}</span>
+          ${task.description ? `<p class="task-description">${task.description}</p>` : ''}
+          ${dueDate ? `<small class="task-date">📅 ${dueDate}</small>` : ''}
+        </div>
+        
+        <span class="task-priority" style="background-color: ${priorityColor}">
+          ${task.priority.toUpperCase()}
+        </span>
+        <span class="task-category">${task.category}</span>
+        
+        <button class="edit-details-btn" onclick="editTaskDetails(${task.id})">⚙️ Detalles</button>
         <button class="edit-btn" onclick="startEditTask(${task.id})">✏️ Editar</button>
         <button class="delete-btn" onclick="deleteTask(${task.id})">🗑️ Eliminar</button>
       `;
     }
+    
     taskList.appendChild(li);
   });
+  
+  // Reinicializar Sortable después de render
+  initSortable();
 }
  
+// ===== FILTRO =====
 function filterTasks() {
   const filter = filterInput.value.toLowerCase();
   const filtered = allTasks.filter(task =>
-    task.title.toLowerCase().includes(filter)
+    task.title.toLowerCase().includes(filter) ||
+    (task.description && task.description.toLowerCase().includes(filter)) ||
+    task.category.toLowerCase().includes(filter)
   );
   renderTasks(filtered);
+  initSortable();
 }
+ 
+// ========== FIN DEL CÓDIGO ==========
+ 
+console.log('App cargada. API URL:', API_URL);
