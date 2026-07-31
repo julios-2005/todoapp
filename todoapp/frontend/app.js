@@ -204,6 +204,15 @@ async function saveTaskDetails() {
   
   try {
     const task = allTasks.find(t => t.id === currentTaskBeingEdited);
+
+    if (!task) {
+      alert('Esta tarea ya no existe (pudo ser eliminada). Se cerrará el panel.');
+      currentTaskBeingEdited = null;
+      showingDetails = false;
+      detailsGroup.style.display = 'none';
+      fetchTasks();
+      return;
+    }
     
     const response = await fetch(`${API_URL}/tasks/${currentTaskBeingEdited}`, {
       method: 'PUT',
@@ -276,6 +285,14 @@ async function updateTaskOrder(taskIds) {
 }
  
 // ===== RENDERIZAR TAREAS =====
+// Escapa HTML para evitar XSS al insertar datos del usuario en el DOM
+function escapeHtml(str) {
+  if (str === null || str === undefined) return '';
+  const div = document.createElement('div');
+  div.textContent = String(str);
+  return div.innerHTML;
+}
+
 function renderTasks(tasks) {
   taskList.innerHTML = '';
   
@@ -308,7 +325,7 @@ function renderTasks(tasks) {
         <input type="checkbox" disabled ${task.completed ? 'checked' : ''} 
                style="cursor: not-allowed; opacity: 0.5;">
         <input type="text" id="edit-input-${task.id}" class="edit-input" 
-               value="${task.title}" 
+               value="${escapeHtml(task.title)}" 
                onkeypress="handleEditKeypress(event, ${task.id})">
         <button class="save-btn" onclick="saveEditTask(${task.id})">💾 Guardar</button>
         <button class="cancel-btn" onclick="cancelEditTask()">❌ Cancelar</button>
@@ -320,15 +337,15 @@ function renderTasks(tasks) {
                onchange="toggleTask(${task.id}, ${task.completed})">
         
         <div class="task-content">
-          <span class="task-title" ondblclick="startEditTask(${task.id})">${task.title}</span>
-          ${task.description ? `<p class="task-description">${task.description}</p>` : ''}
+          <span class="task-title" ondblclick="startEditTask(${task.id})">${escapeHtml(task.title)}</span>
+          ${task.description ? `<p class="task-description">${escapeHtml(task.description)}</p>` : ''}
           ${dueDate ? `<small class="task-date">📅 ${dueDate}</small>` : ''}
         </div>
         
         <span class="task-priority" style="background-color: ${priorityColor}">
-          ${task.priority.toUpperCase()}
+          ${escapeHtml(task.priority.toUpperCase())}
         </span>
-        <span class="task-category">${task.category}</span>
+        <span class="task-category">${escapeHtml(task.category)}</span>
         
         <button class="edit-details-btn" onclick="editTaskDetails(${task.id})">⚙️ Detalles</button>
         <button class="edit-btn" onclick="startEditTask(${task.id})">✏️ Editar</button>
