@@ -35,6 +35,28 @@
 
     <input type="text" id="filterInput" placeholder="🔍 Filtrar tareas...">
 
+    <div class="filters-row">
+      <select id="priorityFilter">
+        <option value="all">Todas las prioridades</option>
+        <option value="high">🔴 Alta</option>
+        <option value="medium">🟡 Media</option>
+        <option value="low">🟢 Baja</option>
+      </select>
+
+      <select id="categoryFilter">
+        <option value="all">Todas las categorías</option>
+        <option value="personal">👤 Personal</option>
+        <option value="work">💼 Trabajo</option>
+        <option value="shopping">🛒 Compras</option>
+        <option value="health">🏥 Salud</option>
+      </select>
+
+      <label class="sort-by-date-label">
+        <input type="checkbox" id="sortByDateCheckbox">
+        📅 Ordenar por fecha más próxima
+      </label>
+    </div>
+
     <ul id="taskList"></ul>
   </div>
 
