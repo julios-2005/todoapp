@@ -13,6 +13,7 @@ const taskList = document.getElementById('taskList');
  
 // Elementos de detalles avanzados
 const detailsGroup = document.getElementById('detailsGroup');
+const detailsTaskTitle = document.getElementById('detailsTaskTitle');
 const descriptionInput = document.getElementById('descriptionInput');
 const dueDateInput = document.getElementById('dueDateInput');
 const priorityInput = document.getElementById('priorityInput');
@@ -67,10 +68,7 @@ async function addTask() {
  
     if (response.ok) {
       taskInput.value = '';
-      descriptionInput.value = '';
-      dueDateInput.value = '';
-      priorityInput.value = 'medium';
-      categoryInput.value = 'personal';
+      resetDetailsFields();
       detailsGroup.style.display = 'none';
       fetchTasks();
     } else {
@@ -183,6 +181,14 @@ function handleEditKeypress(e, id) {
 }
  
 // ===== EDITAR DETALLES (MODAL/PANEL) =====
+function resetDetailsFields() {
+  descriptionInput.value = '';
+  dueDateInput.value = '';
+  priorityInput.value = 'medium';
+  categoryInput.value = 'personal';
+  if (detailsTaskTitle) detailsTaskTitle.textContent = '';
+}
+
 function editTaskDetails(id) {
   const task = allTasks.find(t => t.id === id);
   if (!task) return;
@@ -194,6 +200,7 @@ function editTaskDetails(id) {
   dueDateInput.value = task.due_date || '';
   priorityInput.value = task.priority || 'medium';
   categoryInput.value = task.category || 'personal';
+  if (detailsTaskTitle) detailsTaskTitle.textContent = `Editando detalles de: ${task.title}`;
   
   detailsGroup.style.display = 'flex';
   descriptionInput.focus();
@@ -210,6 +217,7 @@ async function saveTaskDetails() {
       currentTaskBeingEdited = null;
       showingDetails = false;
       detailsGroup.style.display = 'none';
+      resetDetailsFields();
       fetchTasks();
       return;
     }
@@ -231,6 +239,7 @@ async function saveTaskDetails() {
       currentTaskBeingEdited = null;
       showingDetails = false;
       detailsGroup.style.display = 'none';
+      resetDetailsFields();
       fetchTasks();
       alert('Detalles guardados');
     }
@@ -244,6 +253,7 @@ function cancelTaskDetails() {
   currentTaskBeingEdited = null;
   showingDetails = false;
   detailsGroup.style.display = 'none';
+  resetDetailsFields();
 }
  
 // ===== DRAG & DROP =====
