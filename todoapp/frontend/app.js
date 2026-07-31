@@ -13,7 +13,6 @@ const taskList = document.getElementById('taskList');
  
 // Elementos de detalles avanzados
 const detailsGroup = document.getElementById('detailsGroup');
-const detailsTaskTitle = document.getElementById('detailsTaskTitle');
 const descriptionInput = document.getElementById('descriptionInput');
 const dueDateInput = document.getElementById('dueDateInput');
 const priorityInput = document.getElementById('priorityInput');
@@ -186,10 +185,9 @@ function resetDetailsFields() {
   dueDateInput.value = '';
   priorityInput.value = 'medium';
   categoryInput.value = 'personal';
-  if (detailsTaskTitle) detailsTaskTitle.textContent = '';
   taskInput.value = '';
   taskInput.disabled = false;
-  addBtn.disabled = false;
+  addBtn.style.display = '';
 }
 
 function editTaskDetails(id) {
@@ -203,11 +201,10 @@ function editTaskDetails(id) {
   dueDateInput.value = task.due_date || '';
   priorityInput.value = task.priority || 'medium';
   categoryInput.value = task.category || 'personal';
-  if (detailsTaskTitle) detailsTaskTitle.textContent = `Editando detalles de: ${task.title}`;
 
   taskInput.value = task.title;
   taskInput.disabled = true;
-  addBtn.disabled = true;
+  addBtn.style.display = 'none';
   
   detailsGroup.style.display = 'flex';
   descriptionInput.focus();
